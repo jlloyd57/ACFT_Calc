@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block navbar %} {% endblock %}
+{% block content %}
+
+
+<center><img src="/static/csd-t-logo.png"
+    width="400" 
+    height="500"></center>
+
+<body>
+    <div class="column is-4 is-offset-4">
+
+        <h3 class="title" style="color:black">Welcome to APFT Calculator</h3>
+        <div class="box">
+            <h3 class="space">Existing User?</h3>
+            <button class="button is-block is-info is-large is-fullwidth"><a href="{{ url_for('login') }}">Log
+                    in</a></button>
+            <h3 class="space">New User?</h3>
+            <button class="button is-block is-info is-large is-fullwidth"><a href="{{ url_for('signup') }}">Sign
+                    Up</a></button>
+        </div>
+</body>
+{% endblock %}

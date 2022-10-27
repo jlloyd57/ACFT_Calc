@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+
+<h1 class="title" style="color:black">
+  Dashboard
+</h1>
+
+<h2 style="color:black">
+Enter your ACFT event scores for calculation: 
+</h2>
+<br>
+
+<form method="post"  style="color:black">
+  <center>
+  <table border="1" style="width:70%;color:black;background-color:#d0f5ea;" >
+
+    <tr>
+
+      <td>
+        <label for="deadlift">Max Deadlift Weight (pounds): </label>
+      </td>
+
+      <td>
+        <input type="number" name="deadlift">
+      </td>
+
+    </tr>
+    
+    <tr>
+
+      <td>
+        <label for="spt">Standing Power Throw (meters): </label>
+      </td>
+
+      <td>
+        <input type="number" step = "any" name="spt"><br>
+      </td>
+
+    </tr>
+    
+    <tr>
+
+      <td>
+        <label for="hrp">Hand Release Pushups (reps): </label>
+      </td>
+
+      <td>
+        <input type="number" name="hrp">
+      </td>
+
+    </tr>
+    
+    <tr>
+
+      <td>
+        <label for="sdc">Sprint Drag Carry (m:ss) </label>
+      </td>
+
+      <td>
+        <input type="number" name="sdc_m"> : <input type="number" id="sdc_ss" name="sdc_ss">
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td>
+        <label for="plank">Plank (m:ss) </label><br>
+      </td>
+
+      <td>
+        <input type="number" name="plank_m"> : <input type="number" id="plank_ss" name="plank_ss">
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td>
+        <label for="run">Run (mm:ss) </label>
+      </td>
+
+      <td>
+        <input type="number" name="run_mm"> : <input type="number" id="run_ss" name="run_ss">
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td colspan="2">
+        <center>
+          <input type="submit" value="Submit">
+        </center>
+      </td>
+
+    </tr>
+
+  </table>
+  </center>
+  <br>
+  
+</form><br>
+
+<div class="container" style="min-height:100%;width:80%;color:black">
+	{% with messages = get_flashed_messages() %}
+	  {% if messages %}
+	    {% for message in messages %}
+		  <div class="alert alert-warning alert-dismissible" role="alert">
+		  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+			{{message}}
+		  </div>
+		{% endfor %}
+	  {% endif %}
+	{% endwith %}
+	
+	{% block body %}{% endblock %}
+</div>
+
+<p style = "color:black" > <strong>Latest Score:</strong></p><p id="calculated_score"></p> 
+  <div class= "container" style="width:100%;color:black;">
+  {% if data %}
+    {{data[-1][-1]}}
+  {% endif %}
+  </div>
+  <br>
+
+
+<center>
+  <h1 style = "color:black"><strong>{{ title }}</strong></h1>
+
+  <canvas id="chart" width="600" height="400"></canvas>
+  <script>
+
+    // bar chart data
+    var barData = {
+      labels : 
+      [
+        {% for item in labels %}
+          "{{ item }}",
+        {% endfor %}
+      ],
+
+      datasets : 
+      [{
+
+        fillColor: "rgba(255, 220, 0, 0.2)",
+        strokeColor: "rgba(255, 220, 0, 1)",
+        pointColor: "rgba(241, 198, 0, 1)",
+        pointStrokeColor: "#fff",
+        pointHighlightFill: "#fff",
+        pointHighlightStroke: "rgba(151,187,205,1)",
+        bezierCurve : false,
+        data : 
+        [
+
+          {% for item in values %}
+              {{ item }},
+          {% endfor %}
+
+        ]
+
+        }]
+    }
+
+    Chart.defaults.global.animationSteps = 50;
+    Chart.defaults.global.tooltipYPadding = 16;
+    Chart.defaults.global.tooltipCornerRadius = 0;
+    Chart.defaults.global.tooltipTitleFontStyle = "normal";
+    Chart.defaults.global.tooltipFillColor = "rgba(0,0,0,0.8)";
+    Chart.defaults.global.animationEasing = "easeOutBounce";
+    Chart.defaults.global.responsive = false;
+    Chart.defaults.global.scaleLineColor = "black";
+    Chart.defaults.global.scaleFontSize = 16;
+
+    // get bar chart canvas
+    var mychart = document.getElementById("chart").getContext("2d");
+
+    steps = 10
+    max = {{ max }}
+
+    // draw bar chart
+    var LineChartDemo = new Chart(mychart).Line(barData, {
+      scaleOverride: true,
+      scaleSteps: steps,
+      scaleStepWidth: Math.ceil(max / steps),
+      scaleStartValue: 0,
+      scaleShowVerticalLines: true,
+      scaleShowGridLines : true,
+      barShowStroke : true,
+      scaleShowLabels: true,
+      bezierCurve: false,
+    });
+
+  </script>
+</center>
+<br>
+
+<table border="1" padding="10px" style="width:100%;color:black;background-color:#d0f5ea;" >
+  <tr>
+    <th>Date</th>
+    <th>Age</th>
+    <th>Gender</th>
+    <th>Max Deadlift</th>
+    <th>Standing Power Throw</th>
+    <th>Hand Release Pushups</th>
+    <th>Sprint Drag Carry</th>
+    <th>Plank</th>
+    <th>Run</th>
+    <th>Overall Score</th>
+  </tr>
+
+
+{% for item in data %}
+  <tr>
+      <td>{{item[0]}}</td>
+      <td>{{item[2]}}</td>
+      <td>{{item[3]}}</td>
+      <td>{{item[4]}}</td>
+      <td>{{item[5]}}</td>
+      <td>{{item[6]}}</td>
+      <td>{{item[7]}}</td>
+      <td>{{item[8]}}</td>
+      <td>{{item[9]}}</td>
+      <td>{{item[10]}}</td>
+  </tr>
+{% endfor %}
+
+</table>
+{% endblock content%}
